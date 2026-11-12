@@ -1,0 +1,14 @@
+<Application x:Class="TodayMeal.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- 0번 자리는 테마. App.ApplyTheme 이 실행 중에 바꿔 끼운다. -->
+        <ResourceDictionary Source="Themes/Light.xaml"/>
+        <ResourceDictionary Source="Styles.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

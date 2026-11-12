@@ -1,0 +1,629 @@
+/* 오늘급식2 — 웹 / 안드로이드 공용 화면
+   색은 강조색 초록 하나 + 무채색. 모서리는 전부 직각, 그림자와 그라데이션 없음. */
+
+:root {
+  --bg: #FFFFFF;
+  --surface: #F5F5F2;
+  --hover: #E6E6E3;
+  --accent-soft: rgba(10, 123, 85, 0.12);
+  --line: #E6E6E3;
+  --faint: #A6A6A6;
+  --mid: #6B6B6B;
+  --text: #141414;
+  --accent: #0A7B55;
+  --on-accent: #FFFFFF;
+
+  --icon: 38px;      /* 오른쪽 위 아이콘 버튼 한 변 */
+  --side: 28px;      /* 화면 좌우 여백 */
+  --ych: 26px;       /* 올해 급식의 날짜 칸 높이 */
+}
+
+:root[data-theme="dark"] {
+  --bg: #141413;
+  --surface: #1F1F1D;
+  --hover: #2E2E2B;
+  --accent-soft: rgba(52, 199, 150, 0.16);
+  --line: #2E2E2B;
+  --faint: #7A7A76;
+  --mid: #A8A8A4;
+  --text: #EDEDEA;
+  --accent: #34C796;
+  --on-accent: #07140F;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+[hidden] { display: none !important; }
+
+button, input {
+  font: inherit;
+  color: inherit;
+  border-radius: 0;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+button:disabled { cursor: default; }
+
+button:focus-visible, input:focus-visible { outline: 1px solid var(--accent); outline-offset: -2px; }
+
+/* ───────── 맨 위 ───────── */
+
+#top {
+  flex: none;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px 0 var(--side);
+}
+
+#schoolLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icons { display: flex; gap: 2px; }
+
+.icon {
+  width: var(--icon);
+  height: var(--icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mid);
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stepper .icon svg { width: 18px; height: 18px; }
+
+.icon:disabled { color: var(--faint); }
+.icon.on { background: var(--accent-soft); color: var(--accent); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+#refreshBtn.busy svg { animation: spin 0.9s linear infinite; }
+
+@media (hover: hover) {
+  .icon:not(:disabled):not(.on):hover { background: var(--hover); color: var(--text); }
+}
+
+/* ───────── 본문 틀 ───────── */
+
+#content { flex: 1; min-height: 0; position: relative; }
+
+#content > section { height: 100%; display: flex; flex-direction: column; }
+
+.message {
+  margin: auto;
+  padding: 0 24px;
+  max-width: 760px;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--faint);
+  text-align: center;
+  word-break: keep-all;
+}
+
+#monthMessage, #yearMessage { font-size: 26px; }
+
+/* 조식 / 중식 / 석식 전환 */
+.types { display: flex; }
+
+.types button {
+  padding: 4px 2px 5px;
+  margin: 0 8px;
+  font-size: 14px;
+  color: var(--faint);
+  border-bottom: 2px solid transparent;
+}
+
+.types button.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+
+@media (hover: hover) {
+  .types button:not(.on):hover { color: var(--text); }
+}
+
+/* ───────── 하루 화면 ───────── */
+
+#strip {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  min-height: 64px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.stripCell {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 14px 14px 18px;
+  border-left: 1px solid var(--line);
+  min-width: 0;
+}
+
+.stripCell:first-child { border-left: 0; }
+
+button.stripCell.on { background: var(--accent-soft); }
+
+button.stripCell.on::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: -1px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.stripCell .date { font-size: 18px; font-weight: 700; }
+.stripCell .dow { margin: 0 0 2px 6px; font-size: 13px; color: var(--mid); }
+.stripCell.none .dow { color: var(--faint); }
+.stripCell .mark { margin: 0 0 2px auto; font-size: 12px; font-weight: 700; color: var(--accent); }
+
+@media (hover: hover) {
+  button.stripCell:not(.on):hover, .cellBtn:hover { background: var(--hover); }
+}
+
+.hero {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 44px 26px;
+}
+
+.heroHead { flex: none; display: flex; flex-direction: column; align-items: center; }
+
+#dayTitle { font-size: 20px; font-weight: 700; color: var(--accent); text-align: center; }
+
+#dayTypes { margin-top: 8px; }
+
+#dishBox {
+  flex: 1;
+  min-height: 0;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#dishList {
+  flex: none;
+  font-size: 60px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#dayCalories { flex: none; min-height: 19px; text-align: center; color: var(--faint); }
+
+/* ───────── 달력 / 올해 공통 머리줄 ───────── */
+
+.bar {
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px var(--side);
+  border-top: 1px solid var(--line);
+}
+
+.stepper { display: flex; align-items: center; }
+
+.stepTitle { width: 170px; text-align: center; font-size: 22px; font-weight: 700; }
+
+#yearTitle { width: 130px; }
+
+/* ───────── 달력 화면 ───────── */
+
+.monthBar { padding-bottom: 6px; }
+
+#monthTypes { position: absolute; right: var(--side); top: 50%; transform: translateY(-50%); }
+#monthTypes button:last-child { margin-right: 0; }
+
+#monthBody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+.monthWide {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--side) 22px;
+}
+
+.monthNarrow { display: none; }
+
+#monthHead { flex: none; display: grid; }
+
+#monthHead div { padding: 2px 0 7px 10px; font-size: 12.5px; font-weight: 700; color: var(--faint); }
+
+#monthScroll { flex: 1; min-height: 0; overflow-y: auto; }
+
+#monthGrid { display: grid; min-height: 100%; }
+
+.monthCell {
+  min-width: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.monthCell.first { border-left: 0; }
+.monthCell.last { border-bottom: 1px solid var(--line); }
+
+.cellBtn { display: block; width: 100%; height: 100%; }
+
+.cellIn { padding: 8px 8px 9px 10px; }
+
+.cellIn .num { margin: 1px 0 8px; font-size: 13px; font-weight: 700; }
+.cellIn .num.faint { color: var(--faint); }
+
+.cellIn .chip {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 1px 6px 2px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.cellIn .dish {
+  margin: 1px 0;
+  font-size: 12.5px;
+  line-height: 16px;
+  color: var(--mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cellIn.past .dish, .cellIn .dish.more { color: var(--faint); }
+
+/* 폰: 날짜별 목록 */
+#monthMini { flex: none; padding: 6px 16px 12px; border-bottom: 1px solid var(--line); }
+#monthMini .mini { max-width: none; margin: 0; }
+
+#monthList { flex: 1; min-height: 0; overflow-y: auto; }
+
+.listRow {
+  display: flex;
+  width: 100%;
+  padding: 12px 16px 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.listRow .when { flex: none; width: 58px; }
+.listRow .day { font-size: 18px; font-weight: 700; }
+.listRow .dow { margin-left: 5px; font-size: 12.5px; color: var(--mid); }
+.listRow .chip { display: inline-block; padding: 0 6px 1px; font-size: 16px; font-weight: 700; background: var(--accent); color: var(--on-accent); }
+.listRow .dishes { flex: 1; min-width: 0; font-size: 14px; line-height: 21px; color: var(--text); word-break: keep-all; }
+.listRow.past .day, .listRow.past .dow, .listRow.past .dishes { color: var(--faint); }
+
+/* ───────── 올해 화면 ───────── */
+
+.yearBar { border-bottom: 1px solid var(--line); }
+
+#yearStat { position: absolute; left: var(--side); top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--faint); }
+
+.lineBox {
+  height: 34px;
+  padding: 0 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  outline: none;
+  caret-color: var(--text);
+}
+
+.lineBox::placeholder { color: var(--faint); }
+.lineBox:focus, .lineBox:focus-visible { border-bottom-color: var(--accent); outline: none; }
+.lineBox::selection { background: var(--accent); color: var(--on-accent); }
+
+#yearSearch { position: absolute; right: var(--side); top: 50%; transform: translateY(-50%); width: 220px; }
+
+.yearMain { flex: 1; min-height: 0; display: flex; }
+
+#yearGridWrap { flex: 1; min-width: 0; overflow-y: auto; display: flex; padding: 14px 16px 18px; }
+
+#yearGrid {
+  margin: auto;
+  display: grid;
+  --cols: 4;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  width: 100%;
+  max-width: calc((var(--ych) * 8.1 + 28px) * var(--cols));
+  --ych: clamp(22px, calc((100vh - 330px) / 18), 46px);
+}
+
+.mini { min-width: 0; padding: 8px 14px 12px; }
+
+.mini .title { margin: 0 0 6px 5px; font-size: 15px; font-weight: 700; color: var(--accent); }
+
+.miniGrid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: var(--ych); gap: 2px; }
+
+.miniGrid div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--ych) * 0.46);
+  color: var(--faint);
+}
+
+.miniGrid .has { background: var(--accent-soft); color: var(--text); cursor: pointer; }
+.miniGrid .hit { background: var(--accent); color: var(--on-accent); font-weight: 700; }
+.miniGrid .today { border: 1px solid var(--accent); }
+.miniGrid .sel { outline: 1px solid var(--accent); outline-offset: 1px; }
+
+#yearSide {
+  flex: none;
+  width: 280px;
+  overflow-y: auto;
+  padding: 18px 14px 20px 22px;
+  border-left: 1px solid var(--line);
+}
+
+#yearDetail .hint { font-size: 13px; line-height: 21px; color: var(--faint); word-break: keep-all; }
+#yearDetail .date { font-size: 16px; font-weight: 700; color: var(--accent); }
+#yearDetail .kind { margin: 14px 0 3px; font-size: 12.5px; font-weight: 700; color: var(--faint); }
+#yearDetail .kind.single { margin-top: 4px; }
+#yearDetail .dish { margin: 2px 0; }
+#yearDetail .kcal { margin-top: 6px; font-size: 12.5px; color: var(--faint); }
+#yearDetail .big { display: none; margin-top: 10px; }
+
+#yearResults { margin-top: 22px; }
+#yearResults.top { margin-top: 0; }
+#yearResults .head { margin-bottom: 6px; font-size: 13px; font-weight: 700; color: var(--mid); }
+
+.result {
+  display: block;
+  width: 100%;
+  padding: 9px 10px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.result .name { font-weight: 700; }
+.result .sub { margin-top: 2px; font-size: 13px; color: var(--mid); word-break: keep-all; }
+
+@media (hover: hover) {
+  .result:hover, .listRow:hover { background: var(--hover); }
+}
+
+/* ───────── 학교 고르기 ───────── */
+
+#setupView { border-top: 1px solid var(--line); overflow-y: auto; }
+
+.setupBox { width: 460px; max-width: 100%; margin: auto; padding: 24px 20px 84px; }
+
+.setupBox h1 { margin: 0; font-size: 34px; text-align: center; word-break: keep-all; }
+
+.setupBox p { margin: 12px 0 30px; color: var(--mid); text-align: center; word-break: keep-all; }
+
+.search .row { position: relative; }
+
+.search .lineBox { width: 100%; height: 44px; padding-right: 52px; font-size: 17px; }
+
+.search .go { position: absolute; right: 0; top: 0; height: 44px; padding: 0 4px; }
+
+.search .status { margin-top: 12px; font-size: 13px; color: var(--faint); }
+
+.search .results { max-height: 280px; margin-top: 4px; overflow-y: auto; }
+
+.search .result .name { font-size: 15px; }
+.search .result .sub { margin-top: 3px; font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.link { color: var(--accent); font-weight: 700; border-bottom: 1px solid transparent; }
+
+@media (hover: hover) {
+  .link:hover { border-bottom-color: var(--accent); }
+}
+
+/* ───────── 메뉴 / 설정 탭 ───────── */
+
+#panel {
+  position: absolute;
+  z-index: 10;
+  top: 45px;
+  right: 14px;
+  width: 320px;
+  max-width: calc(100vw - 28px);
+  max-height: calc(100dvh - 60px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.14s ease-in, opacity 0.14s ease-in;
+}
+
+#panel.open { transform: scale(1); opacity: 1; transition: transform 0.18s ease-out, opacity 0.18s ease-out; }
+
+/* 기준점: 누른 버튼의 가운데 바로 아래 */
+#panel.settings { transform-origin: calc(100% - var(--icon) / 2) 0; }
+#panel.menu { transform-origin: calc(100% - var(--icon) * 1.5 - 2px) 0; }
+
+#menuContent { padding: 8px 0; }
+
+.nav {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 15px 28px 16px;
+  font-size: 16px;
+}
+
+.nav.on { color: var(--accent); font-weight: 700; }
+.nav.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+.nav:disabled { color: var(--faint); }
+
+@media (hover: hover) {
+  .nav:not(:disabled):hover { background: var(--hover); }
+}
+
+#settingsContent { display: flex; flex-direction: column; min-height: 0; }
+
+.settingsBody { flex: 1; min-height: 0; overflow-y: auto; padding: 26px 28px 16px; }
+
+.label { font-size: 13px; color: var(--faint); }
+.themeLabel { margin-top: 34px; }
+
+#currentSchool { margin-top: 8px; font-size: 18px; font-weight: 700; word-break: keep-all; }
+#currentSchoolSub { margin-top: 4px; font-size: 12.5px; color: var(--faint); }
+#changeSchoolBtn { margin-top: 12px; }
+#panelSearch { margin-top: 10px; }
+
+.segment { display: grid; grid-template-columns: 1fr 1fr; margin-top: 10px; }
+
+.segment button {
+  height: 38px;
+  text-align: center;
+  color: var(--mid);
+  border: 1px solid var(--line);
+}
+
+.segment button + button { margin-left: -1px; }
+.segment button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; position: relative; }
+
+@media (hover: hover) {
+  .segment button:not(.on):hover { background: var(--hover); }
+}
+
+.discord { flex: none; padding: 0 28px 22px; font-size: 13px; color: var(--faint); }
+
+/* ───────── 패드: 넓은 화면 그대로, 손가락에 맞게 크게 ───────── */
+
+@media (pointer: coarse) {
+  :root { --icon: 44px; }
+  .icon svg { width: 22px; height: 22px; }
+  .types button { padding: 8px 4px 9px; font-size: 15px; }
+  .nav { padding: 18px 28px 19px; }
+  .segment button { height: 44px; }
+  .result { padding: 12px 10px 13px; }
+  #yearDetail .big { display: inline-block; }
+  #panel { top: 48px; }
+}
+
+@media (pointer: coarse) and (min-width: 700px) {
+  body { font-size: 15px; }
+  #top { height: 60px; }
+  #schoolLabel { font-size: 17px; }
+  #panel { top: 53px; width: 360px; }
+  #strip { min-height: 78px; }
+  .stripCell { padding: 16px 16px 18px 20px; }
+  .stripCell .date { font-size: 21px; }
+  .stripCell .dow { font-size: 15px; }
+  .stripCell .mark { font-size: 13.5px; }
+  #dayTitle { font-size: 23px; }
+  #dayCalories { font-size: 16px; }
+  .stepTitle { font-size: 24px; }
+  .cellIn .num, .cellIn .chip { font-size: 15px; }
+  .cellIn .dish { font-size: 14px; line-height: 19px; }
+  #yearSide { width: 320px; }
+  #yearDetail .date { font-size: 18px; }
+  #yearDetail .dish { font-size: 16px; margin: 4px 0; }
+  #yearGrid { --ych: clamp(26px, calc((100vh - 350px) / 18), 46px); }
+}
+
+/* 패드 세로 / 좁은 창: 열두 달을 3열로 */
+@media (max-width: 1099px) {
+  #yearGrid { --cols: 3; --ych: clamp(22px, calc((100vh - 400px) / 24), 40px); }
+}
+
+@media (max-width: 899px) and (min-width: 700px) {
+  #yearSide { width: 240px; }
+  #yearStat { display: none; }
+  .yearBar { justify-content: flex-start; }
+}
+
+/* ───────── 폰 ───────── */
+
+@media (max-width: 699px) {
+  :root { --side: 16px; }
+
+  #top { padding-right: 8px; }
+  #panel { right: 8px; max-width: calc(100vw - 16px); }
+
+  .stripCell { flex-direction: column; align-items: flex-start; padding: 9px 4px 10px 10px; }
+  .stripCell .date { font-size: 16px; }
+  .stripCell .dow { margin: 1px 0 0; font-size: 12px; }
+  .stripCell .mark { position: absolute; right: 7px; bottom: 10px; margin: 0; font-size: 11px; }
+
+  .hero { padding: 18px 14px 18px; }
+  #dayTitle { font-size: 18px; }
+  .message { font-size: 24px; }
+  #monthMessage, #yearMessage { font-size: 20px; }
+
+  .stepTitle { width: 138px; font-size: 19px; }
+  #yearTitle { width: 96px; }
+  .monthBar { justify-content: flex-start; padding-left: 6px; }
+
+  .monthWide { display: none; }
+  .monthNarrow { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .monthNarrow .miniGrid { grid-auto-rows: 34px; gap: 3px; }
+  .monthNarrow .miniGrid div { font-size: 14px; }
+
+  .yearBar { flex-wrap: wrap; justify-content: flex-start; padding: 8px 16px 10px 6px; }
+  #yearStat { position: static; transform: none; margin-left: auto; }
+  #yearSearch { position: static; transform: none; width: 100%; margin: 4px 0 0 10px; height: 38px; font-size: 16px; }
+
+  .yearMain { flex-direction: column; }
+  #yearGridWrap { padding: 8px 6px 12px; }
+  #yearGrid { --cols: 2; max-width: none; --ych: 24px; }
+  .mini { padding: 8px 8px 10px; }
+  .miniGrid div { font-size: 11.5px; }
+  #yearSide { width: auto; max-height: 40%; padding: 14px 16px 16px; border-left: 0; border-top: 1px solid var(--line); background: var(--surface); }
+
+  .setupBox h1 { font-size: 26px; }
+  .search .lineBox { font-size: 16px; }
+}
+
+/* 낮은 화면 (폰 가로): 위아래 여백을 줄인다 */
+@media (max-height: 460px) {
+  #top { height: 46px; }
+  #panel { top: 42px; }
+  #strip { min-height: 48px; }
+  .stripCell { padding-top: 8px; padding-bottom: 9px; }
+  .hero { padding-top: 10px; padding-bottom: 10px; }
+  #dishBox { margin: 6px 0; }
+  .nav { padding-top: 11px; padding-bottom: 12px; }
+}
+
+/* 급식 없는 달: 안내문만 가운데에 */
+#monthBody.empty .monthWide, #monthBody.empty .monthNarrow { display: none; }

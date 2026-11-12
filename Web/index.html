@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>오늘급식2</title>
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 맨 위: 학교 이름 + 아이콘 3개 -->
+<header id="top">
+  <div id="schoolLabel"></div>
+  <div class="icons">
+    <button id="refreshBtn" class="icon" title="새로고침" aria-label="새로고침">
+      <svg viewBox="0 0 24 24"><path d="M3,12 A9,9 0 0 1 12,3 A9.75,9.75 0 0 1 18.74,5.74 L21,8 M21,3 V8 H16 M21,12 A9,9 0 0 1 12,21 A9.75,9.75 0 0 1 5.26,18.26 L3,16 M8,16 H3 V21"/></svg>
+    </button>
+    <button id="menuBtn" class="icon" title="메뉴" aria-label="메뉴">
+      <svg viewBox="0 0 24 24"><path d="M3,6 H21 M3,12 H21 M3,18 H21"/></svg>
+    </button>
+    <button id="settingsBtn" class="icon" title="설정" aria-label="설정">
+      <svg viewBox="0 0 24 24"><path id="gearPath"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- 본문: 화면 넷 중 하나만 보인다 -->
+<main id="content">
+
+  <!-- 하루 급식 (기본 화면) -->
+  <section id="dayView" hidden>
+    <div id="strip"></div>
+    <div class="hero">
+      <div class="heroHead">
+        <div id="dayTitle"></div>
+        <div id="dayTypes" class="types"></div>
+      </div>
+      <div id="dishBox">
+        <div id="dishList"></div>
+        <div id="dayMessage" class="message" hidden></div>
+      </div>
+      <div id="dayCalories"></div>
+    </div>
+  </section>
+
+  <!-- 이번달 급식: 달력 -->
+  <section id="monthView" hidden>
+    <div class="bar monthBar">
+      <div class="stepper">
+        <button id="monthPrev" class="icon" title="이전 달" aria-label="이전 달"><svg viewBox="0 0 24 24"><path d="M15,5 L8,12 L15,19"/></svg></button>
+        <div id="monthTitle" class="stepTitle"></div>
+        <button id="monthNext" class="icon" title="다음 달" aria-label="다음 달"><svg viewBox="0 0 24 24"><path d="M9,5 L16,12 L9,19"/></svg></button>
+      </div>
+      <div id="monthTypes" class="types"></div>
+    </div>
+    <div id="monthBody">
+      <!-- 넓은 화면 (패드, PC): 칸마다 메뉴가 들어가는 달력 -->
+      <div class="monthWide">
+        <div id="monthHead"></div>
+        <div id="monthScroll"><div id="monthGrid"></div></div>
+      </div>
+      <!-- 좁은 화면 (폰): 작은 달력 + 날짜별 목록 -->
+      <div class="monthNarrow">
+        <div id="monthMini"></div>
+        <div id="monthList"></div>
+      </div>
+      <div id="monthMessage" class="message" hidden></div>
+    </div>
+  </section>
+
+  <!-- 올해 급식: 열두 달 한눈에 + 메뉴 검색 -->
+  <section id="yearView" hidden>
+    <div class="bar yearBar">
+      <div id="yearStat"></div>
+      <div class="stepper">
+        <button id="yearPrev" class="icon" title="이전 해" aria-label="이전 해"><svg viewBox="0 0 24 24"><path d="M15,5 L8,12 L15,19"/></svg></button>
+        <div id="yearTitle" class="stepTitle"></div>
+        <button id="yearNext" class="icon" title="다음 해" aria-label="다음 해"><svg viewBox="0 0 24 24"><path d="M9,5 L16,12 L9,19"/></svg></button>
+      </div>
+      <input id="yearSearch" class="lineBox" type="text" placeholder="메뉴 검색 (예: 치킨)" autocomplete="off">
+    </div>
+    <div class="yearMain">
+      <div id="yearGridWrap">
+        <div id="yearGrid"></div>
+        <div id="yearMessage" class="message" hidden></div>
+      </div>
+      <aside id="yearSide">
+        <div id="yearDetail"></div>
+        <div id="yearResults"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 처음 켰을 때: 학교 고르기 -->
+  <section id="setupView" hidden>
+    <div class="setupBox">
+      <h1>어느 학교 급식을 볼까요?</h1>
+      <p>한 번 고르면 다음부터는 켜자마자 오늘 급식이 나옵니다.</p>
+      <div id="setupSearch"></div>
+    </div>
+  </section>
+</main>
+
+<!-- 누른 버튼에서 펼쳐져 나오는 탭 (메뉴 / 설정) -->
+<div id="panel" hidden>
+  <div id="menuContent">
+    <button id="navToday" class="nav">오늘 급식</button>
+    <button id="navMonth" class="nav">이번달 급식</button>
+    <button id="navYear" class="nav">올해 급식</button>
+  </div>
+  <div id="settingsContent">
+    <div class="settingsBody">
+      <div class="label">학교</div>
+      <div id="currentSchool"></div>
+      <div id="currentSchoolSub"></div>
+      <button id="changeSchoolBtn" class="link">학교 변경</button>
+      <div id="panelSearch" hidden></div>
+
+      <div class="label themeLabel">테마</div>
+      <div class="segment">
+        <button id="themeLight">화이트</button>
+        <button id="themeDark">다크</button>
+      </div>
+    </div>
+    <div class="discord">디스코드 : @qks__h</div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

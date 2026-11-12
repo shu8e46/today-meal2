@@ -1,0 +1,254 @@
+<Window x:Class="TodayMeal.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TodayMeal"
+        Title="오늘급식2" Width="1160" Height="820" MinWidth="880" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Bg}" Foreground="{DynamicResource Text}"
+        FontFamily="Malgun Gothic" FontSize="14"
+        UseLayoutRounding="True" SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display">
+  <Grid x:Name="Root" Background="{DynamicResource Bg}" ClipToBounds="True">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="52"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- ───────── 맨 위: 학교 이름 + 아이콘 3개 ───────── -->
+    <TextBlock x:Name="SchoolLabel" Margin="28,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="Bold"/>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0">
+      <Button x:Name="RefreshBtn" Style="{StaticResource IconButton}" Click="Refresh_Click" ToolTip="새로고침 (F5)"
+              AutomationProperties.Name="새로고침">
+        <Viewbox Width="20" Height="20">
+          <Canvas Width="24" Height="24" RenderTransformOrigin="0.5,0.5">
+            <Canvas.RenderTransform>
+              <RotateTransform x:Name="RefreshSpin"/>
+            </Canvas.RenderTransform>
+            <Path Style="{StaticResource IconPath}"
+                  Data="M3,12 A9,9 0 0 1 12,3 A9.75,9.75 0 0 1 18.74,5.74 L21,8 M21,3 V8 H16 M21,12 A9,9 0 0 1 12,21 A9.75,9.75 0 0 1 5.26,18.26 L3,16 M8,16 H3 V21"/>
+          </Canvas>
+        </Viewbox>
+      </Button>
+      <Button x:Name="MenuBtn" Style="{StaticResource IconButton}" Click="Menu_Click" ToolTip="메뉴" Margin="2,0,0,0"
+              AutomationProperties.Name="메뉴">
+        <Viewbox Width="20" Height="20">
+          <Canvas Width="24" Height="24">
+            <Path Style="{StaticResource IconPath}" Data="M3,6 H21 M3,12 H21 M3,18 H21"/>
+          </Canvas>
+        </Viewbox>
+      </Button>
+      <Button x:Name="SettingsBtn" Style="{StaticResource IconButton}" Click="Settings_Click" ToolTip="설정" Margin="2,0,0,0"
+              AutomationProperties.Name="설정">
+        <Viewbox Width="20" Height="20">
+          <Canvas Width="24" Height="24">
+            <Path x:Name="GearPath" Style="{StaticResource IconPath}"/>
+          </Canvas>
+        </Viewbox>
+      </Button>
+    </StackPanel>
+
+    <!-- ───────── 본문: 화면 넷 중 하나만 보인다 ───────── -->
+    <Grid x:Name="ContentHost" Grid.Row="1" Background="Transparent">
+
+      <!-- 하루 급식 (기본 화면) -->
+      <Grid x:Name="DayView" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 위쪽 5칸: 오늘 + 다음 급식일 4개 -->
+        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,1">
+          <UniformGrid x:Name="Strip" Rows="1" Columns="5" MinHeight="64"/>
+        </Border>
+
+        <!-- 가운데 크게 -->
+        <Grid Grid.Row="1" Margin="44,24,44,26">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+
+          <StackPanel HorizontalAlignment="Center">
+            <TextBlock x:Name="DayTitle" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Accent}" HorizontalAlignment="Center"/>
+            <StackPanel x:Name="DayTypes" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+          </StackPanel>
+
+          <Viewbox x:Name="DishBox" Grid.Row="1" Stretch="Uniform" Margin="0,12,0,12">
+            <StackPanel x:Name="DishList" TextOptions.TextFormattingMode="Ideal"/>
+          </Viewbox>
+          <TextBlock x:Name="DayMessage" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     FontSize="34" FontWeight="Bold" Foreground="{DynamicResource TextFaint}"
+                     TextAlignment="Center" TextWrapping="Wrap" MaxWidth="760" Visibility="Collapsed"
+                     TextOptions.TextFormattingMode="Ideal"/>
+
+          <TextBlock x:Name="DayCalories" Grid.Row="2" HorizontalAlignment="Center" FontSize="14"
+                     Foreground="{DynamicResource TextFaint}"/>
+        </Grid>
+      </Grid>
+
+      <!-- 이번달 급식: 달력 -->
+      <Grid x:Name="MonthView" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0">
+          <Grid Margin="28,10,28,6">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+              <Button Style="{StaticResource IconButton}" Click="MonthPrev_Click" ToolTip="이전 달">
+                <Viewbox Width="18" Height="18">
+                  <Canvas Width="24" Height="24">
+                    <Path Style="{StaticResource IconPath}" Data="M15,5 L8,12 L15,19"/>
+                  </Canvas>
+                </Viewbox>
+              </Button>
+              <TextBlock x:Name="MonthTitle" Width="170" TextAlignment="Center" VerticalAlignment="Center"
+                         FontSize="22" FontWeight="Bold" TextOptions.TextFormattingMode="Ideal"/>
+              <Button Style="{StaticResource IconButton}" Click="MonthNext_Click" ToolTip="다음 달">
+                <Viewbox Width="18" Height="18">
+                  <Canvas Width="24" Height="24">
+                    <Path Style="{StaticResource IconPath}" Data="M9,5 L16,12 L9,19"/>
+                  </Canvas>
+                </Viewbox>
+              </Button>
+            </StackPanel>
+            <StackPanel x:Name="MonthTypes" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+          </Grid>
+        </Border>
+
+        <!-- 요일 이름 -->
+        <Grid x:Name="MonthHead" Grid.Row="1" Margin="28,0,0,0" HorizontalAlignment="Left"
+              Width="{Binding ActualWidth, ElementName=MonthGrid}"/>
+
+        <ScrollViewer x:Name="MonthScroll" Grid.Row="2" Margin="28,0,18,22"
+                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                      SizeChanged="MonthScroll_SizeChanged">
+          <Grid x:Name="MonthGrid" Margin="0,0,10,0"/>
+        </ScrollViewer>
+
+        <TextBlock x:Name="MonthMessage" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextFaint}"
+                   TextAlignment="Center" TextWrapping="Wrap" MaxWidth="700" Visibility="Collapsed"
+                   TextOptions.TextFormattingMode="Ideal"/>
+      </Grid>
+
+      <!-- 올해 급식: 열두 달 한눈에 + 메뉴 검색 -->
+      <Grid x:Name="YearView" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,1">
+          <Grid Margin="28,10,28,10">
+            <TextBlock x:Name="YearStat" VerticalAlignment="Center" FontSize="13" Foreground="{DynamicResource TextFaint}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+              <Button Style="{StaticResource IconButton}" Click="YearPrev_Click" ToolTip="이전 해">
+                <Viewbox Width="18" Height="18">
+                  <Canvas Width="24" Height="24">
+                    <Path Style="{StaticResource IconPath}" Data="M15,5 L8,12 L15,19"/>
+                  </Canvas>
+                </Viewbox>
+              </Button>
+              <TextBlock x:Name="YearTitle" Width="130" TextAlignment="Center" VerticalAlignment="Center"
+                         FontSize="22" FontWeight="Bold" TextOptions.TextFormattingMode="Ideal"/>
+              <Button Style="{StaticResource IconButton}" Click="YearNext_Click" ToolTip="다음 해">
+                <Viewbox Width="18" Height="18">
+                  <Canvas Width="24" Height="24">
+                    <Path Style="{StaticResource IconPath}" Data="M9,5 L16,12 L9,19"/>
+                  </Canvas>
+                </Viewbox>
+              </Button>
+            </StackPanel>
+            <TextBox x:Name="YearSearch" Style="{StaticResource LineBox}" Tag="메뉴 검색 (예: 치킨)"
+                     Width="220" Height="34" HorizontalAlignment="Right" TextChanged="YearSearch_TextChanged"/>
+          </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="280"/>
+          </Grid.ColumnDefinitions>
+
+          <Viewbox x:Name="YearBox" Stretch="Uniform" Margin="16,14,16,18">
+            <UniformGrid x:Name="YearGrid" Columns="4" TextOptions.TextFormattingMode="Ideal"/>
+          </Viewbox>
+          <TextBlock x:Name="YearMessage" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextFaint}"
+                     TextAlignment="Center" TextWrapping="Wrap" MaxWidth="560" Visibility="Collapsed"
+                     TextOptions.TextFormattingMode="Ideal"/>
+
+          <Border Grid.Column="1" BorderBrush="{DynamicResource Line}" BorderThickness="1,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Margin="22,18,14,20">
+                <StackPanel x:Name="YearDetail"/>
+                <StackPanel x:Name="YearResults" Margin="0,22,0,0"/>
+              </StackPanel>
+            </ScrollViewer>
+          </Border>
+        </Grid>
+      </Grid>
+
+      <!-- 처음 켰을 때: 학교 고르기 -->
+      <Grid x:Name="SetupView" Visibility="Collapsed">
+        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0"/>
+        <StackPanel Width="460" VerticalAlignment="Center" Margin="0,0,0,60">
+          <TextBlock Text="어느 학교 급식을 볼까요?" FontSize="34" FontWeight="Bold" TextAlignment="Center"
+                     TextOptions.TextFormattingMode="Ideal"/>
+          <TextBlock Text="한 번 고르면 다음부터는 켜자마자 오늘 급식이 나옵니다." Margin="0,12,0,0" FontSize="14"
+                     Foreground="{DynamicResource TextMid}" TextAlignment="Center"/>
+          <local:SchoolSearch x:Name="SetupSearch" Margin="0,30,0,0"/>
+        </StackPanel>
+      </Grid>
+    </Grid>
+
+    <!-- ───────── 오른쪽에서 밀려 나오는 탭 (메뉴 / 설정) ───────── -->
+    <Border x:Name="SidePanel" Grid.Row="1" Width="320" Margin="0,-7,14,0" Visibility="Collapsed" Opacity="0"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+      <Border.RenderTransform>
+        <ScaleTransform x:Name="PanelScale" ScaleX="0" ScaleY="0"/>
+      </Border.RenderTransform>
+      <Grid>
+        <!-- 메뉴 -->
+        <StackPanel x:Name="MenuContent" Margin="0,8,0,8">
+          <Button x:Name="NavToday" Content="오늘 급식" Style="{StaticResource NavButton}" Click="NavToday_Click"/>
+          <Button x:Name="NavMonth" Content="이번달 급식" Style="{StaticResource NavButton}" Click="NavMonth_Click"/>
+          <Button x:Name="NavYear" Content="올해 급식" Style="{StaticResource NavButton}" Click="NavYear_Click"/>
+        </StackPanel>
+
+        <!-- 설정 -->
+        <Grid x:Name="SettingsContent" Visibility="Collapsed">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="28,26,28,16">
+              <TextBlock Text="학교" FontSize="13" Foreground="{DynamicResource TextFaint}"/>
+              <TextBlock x:Name="CurrentSchool" Margin="0,8,0,0" FontSize="18" FontWeight="Bold" TextWrapping="Wrap"/>
+              <TextBlock x:Name="CurrentSchoolSub" Margin="0,4,0,0" FontSize="12.5" Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap"/>
+              <Button x:Name="ChangeSchoolBtn" Content="학교 변경" Style="{StaticResource LinkButton}" FontSize="14"
+                      HorizontalAlignment="Left" Margin="0,12,0,0" Click="ChangeSchool_Click"/>
+              <local:SchoolSearch x:Name="PanelSearch" Margin="0,10,0,0" Visibility="Collapsed"/>
+
+              <TextBlock Text="테마" Margin="0,34,0,0" FontSize="13" Foreground="{DynamicResource TextFaint}"/>
+              <UniformGrid Columns="2" Margin="0,10,0,0">
+                <RadioButton x:Name="ThemeLight" Content="화이트" GroupName="theme" Style="{StaticResource Segment}" Checked="Theme_Checked"/>
+                <RadioButton x:Name="ThemeDark" Content="다크" GroupName="theme" Style="{StaticResource Segment}" Margin="-1,0,0,0" Checked="Theme_Checked"/>
+              </UniformGrid>
+            </StackPanel>
+          </ScrollViewer>
+          <TextBlock Grid.Row="1" Text="디스코드 : @qks__h" Margin="28,0,28,22" FontSize="13"
+                     Foreground="{DynamicResource TextFaint}"/>
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

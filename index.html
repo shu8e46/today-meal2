@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘급식2 받기</title>
+<meta name="description" content="켜면 우리 학교 오늘 급식이 화면 가운데에 크게 나오는 앱. 윈도우, 안드로이드, 웹.">
+<link rel="icon" href="Web/icon.png">
+<style>
+  :root {
+    --bg: #FFFFFF; --hover: #F5F5F2; --line: #E6E6E3; --faint: #A6A6A6; --mid: #6B6B6B; --text: #141414; --accent: #0A7B55;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --hover: #1F1F1D; --line: #2E2E2B; --faint: #7A7A76; --mid: #A8A8A4; --text: #EDEDEA; --accent: #34C796; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+  main { max-width: 620px; margin: 0 auto; padding: 72px 24px 48px; }
+  h1 { margin: 0; font-size: 44px; line-height: 1.2; }
+  .lead { margin: 12px 0 44px; font-size: 17px; color: var(--mid); }
+  .list { border-top: 1px solid var(--line); }
+  a.item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 12px;
+    border-bottom: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+  a.item:hover { background: var(--hover); }
+  a.item:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+  .item .what { flex: 1; min-width: 0; }
+  .item .name { font-size: 19px; font-weight: 700; }
+  .item .note { margin-top: 2px; font-size: 13.5px; color: var(--mid); }
+  .item .go { flex: none; font-weight: 700; color: var(--accent); }
+  h2 { margin: 44px 0 10px; font-size: 14px; color: var(--faint); font-weight: 400; }
+  ol { margin: 0 0 0 20px; padding: 0; color: var(--mid); }
+  ol li { margin: 4px 0; }
+  b { color: var(--text); }
+  footer { margin-top: 56px; font-size: 13px; color: var(--faint); }
+  @media (max-width: 480px) {
+    main { padding-top: 44px; }
+    h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>오늘급식2</h1>
+  <p class="lead">켜면 우리 학교 오늘 급식이 화면 가운데에 크게 나옵니다.</p>
+
+  <div class="list">
+    <a class="item" href="download/TodayMeal-Windows.zip" download>
+      <div class="what">
+        <div class="name">윈도우</div>
+        <div class="note">Windows 10, 11 · zip 파일</div>
+      </div>
+      <div class="go">받기</div>
+    </a>
+    <a class="item" href="download/TodayMeal-Android.zip" download>
+      <div class="what">
+        <div class="name">안드로이드</div>
+        <div class="note">폰, 패드 · Android 8 이상 · zip 파일</div>
+      </div>
+      <div class="go">받기</div>
+    </a>
+    <a class="item" href="Web/">
+      <div class="what">
+        <div class="name">웹</div>
+        <div class="note">설치 없이 브라우저에서 바로</div>
+      </div>
+      <div class="go">열기</div>
+    </a>
+  </div>
+
+  <h2>윈도우에 설치하기</h2>
+  <ol>
+    <li>받은 zip 파일의 압축을 풉니다.</li>
+    <li><b>TodayMeal.exe</b> 를 실행합니다. 따로 설치할 것은 없습니다.</li>
+    <li>"Windows의 PC 보호" 창이 뜨면 <b>추가 정보 → 실행</b>을 누릅니다.</li>
+  </ol>
+
+  <h2>안드로이드에 설치하기</h2>
+  <ol>
+    <li>받은 zip 파일의 압축을 풉니다.</li>
+    <li><b>TodayMeal.apk</b> 를 눌러 설치합니다.</li>
+    <li>"출처를 알 수 없는 앱" 안내가 나오면 이 앱 설치를 허용합니다.</li>
+  </ol>
+
+  <footer>급식 정보: 나이스 교육정보 개방 포털 · 디스코드 : @qks__h</footer>
+</main>
+</body>
+</html>
